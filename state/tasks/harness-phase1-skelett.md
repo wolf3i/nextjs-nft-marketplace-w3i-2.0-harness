@@ -1,8 +1,9 @@
 SCHRITT 0: Arbeitsverzeichnis ausgeben und gegen das im Auftrag genannte
 Zielverzeichnis prüfen. Bei Abweichung: abbrechen, melden, nichts ändern.
 Danach: `git status` und `git branch -vv` zeigen. Der Arbeitsbaum muss sauber
-sein und auf `main` stehen, Stand `e717a5d`. Weicht etwas ab, anhalten und
-melden — nicht raten.
+sein und auf dem Branch `harness/phase1-skelett` stehen, der auf `e717a5d`
+(`main`) fußt und genau einen Commit darüber trägt: diese Auftragsdatei.
+Weicht etwas ab, anhalten und melden — nicht raten.
 
 Zielverzeichnis: /home/wolfgang/w3i/nextjs-nft-marketplace-w3i-2.0-harness
 
