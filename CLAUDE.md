@@ -30,7 +30,7 @@ npm run env:check               # Validate required env vars are set
 npm run env:check:prod          # Same, against production requirements
 ```
 
-Node >= 20.19.0 is required (`engines` in package.json; `.nvmrc` pins the dev version).
+Node version: see `engines` in `package.json` and `.nvmrc` for the pinned dev version.
 
 ## Architecture
 
@@ -53,7 +53,7 @@ When adding a feature that reads NFT data, prefer reading from `nft_metadata` (v
 
 ### API layer: `apiHandler` + middleware, always
 
-Every route in `src/app/api/**/route.ts` is wrapped in `apiHandler()` (`src/lib/api/handler.ts`), which handles error formatting, logging, rate limiting, and CORS. Don't hand-roll try/catch + `NextResponse.json` in a route — throw a typed error instead. Quick-reference examples and the full middleware list (`withAuth`, `withAdmin`, `withValidation`, `rateLimit`) are in `src/lib/README.md`; rate-limit tiers are in `docs/api/routes.md`; the admin signature/session flow is in `docs/api/authentication.md`.
+Every route in `src/app/api/**/route.ts` is wrapped in `apiHandler()` (`src/lib/api/handler.ts`), which handles error formatting, logging, rate limiting, and CORS. Don't hand-roll try/catch + `NextResponse.json` in a route — throw a typed error instead. <!-- check-docs-ignore: NextResponse.json ist ein Methodenaufruf, kein Dateiname --> Quick-reference examples and the full middleware list (`withAuth`, `withAdmin`, `withValidation`, `rateLimit`) are in `src/lib/README.md`; rate-limit tiers are in `docs/api/routes.md`; the admin signature/session flow is in `docs/api/authentication.md`.
 
 Admin routes (`/admin/*`, `/api/admin/*`, `/api/nft/admin/*`) are additionally gated at the edge by `middleware.ts`, which verifies the `admin-session` JWT cookie before the request even reaches the route handler.
 

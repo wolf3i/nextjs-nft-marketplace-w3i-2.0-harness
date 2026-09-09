@@ -159,3 +159,43 @@ Zusammenfassung
 | 5 | node scripts/check-contract.mjs | 0  |
 | 6 | npm run test:run           | 0         |
 | — | npm run check (Gesamtlauf)  | 1 (bricht bei Glied 3 ab) |
+
+================================================================================
+Nachlauf nach Phase 2a
+================================================================================
+Erhoben am: 2026-09-08
+Auftrag: state/tasks/harness-phase2a-check-gruen.md
+Änderungen: README.md:437 (Verweis + Codeblock auf src/config/networks.ts
+korrigiert), CLAUDE.md:56 (check-docs-ignore: für NextResponse.json-
+Falschtreffer), CLAUDE.md:33 (Versionsnummer entfernt, Verweis auf engines/
+.nvmrc behalten).
+
+Befehl: npm run check
+Exit-Code: 0
+
+--- Ausgabe (gekürzt auf die relevanten Abschnitte) ---
+> npm run lint && npm run typecheck && node scripts/check-docs.mjs &&
+> node scripts/check-rules.mjs && node scripts/check-contract.mjs &&
+> npm run test:run
+
+=== Doku-Check ===
+
+✓ Keine Befunde.
+
+=== Regel-Check ===
+
+ⓘ Keine Regeln registriert — leerer Harness (siehe SETUP.md Punkt 4).
+
+=== Vertrags-Check ===
+
+✓ 2 Vertrag/Verträge geprüft, keine Befunde.
+
+Test Files  5 passed (5)
+     Tests  45 passed (45)
+
+--- Ende Ausgabe ---
+
+Ergebnis: Alle sechs Kettenglieder grün, `npm run check` Exit 0.
+Das rote Kettenglied aus der Phase-1-Baseline (`node scripts/check-docs.mjs`,
+drei Befunde) ist behoben und einzeln nachgeprüft (siehe Ausgabe oben,
+Exit 0, „Keine Befunde.").

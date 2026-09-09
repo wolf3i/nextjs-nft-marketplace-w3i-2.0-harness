@@ -434,14 +434,13 @@ UI Components
 
 ### **Blockchain Networks**
 
-Configure supported networks in `src/lib/config.ts`:
+Configure supported networks in `src/config/networks.ts`:
 
 ```typescript
-export const WEB3_CONFIG = {
-  defaultChainId: 1, // Ethereum Mainnet
-  supportedChainIds: [1, 5, 11155111], // Mainnet, Goerli, Sepolia
-  infuraProjectId: process.env.NEXT_PUBLIC_INFURA_PROJECT_ID,
-  alchemyApiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+export const NETWORK_CONFIG: NetworkMapping = {
+  "31337": { NftMarketplace: [...], MultiSigWallet: [] },      // Hardhat Local
+  "11155111": { NftMarketplace: [...], MultiSigWallet: [...] }, // Sepolia Testnet
+  "1": { NftMarketplace: [...], MultiSigWallet: [...] },        // Ethereum Mainnet
 };
 ```
 

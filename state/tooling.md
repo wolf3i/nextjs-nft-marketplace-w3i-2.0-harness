@@ -5,7 +5,7 @@
 
 | Werkzeug | Zweck | Eingeführt (Datum) | Über Skill `werkzeug-auswahl` geprüft? |
 |---|---|---|---|
-| `.claude/skills/ponytail/` (vendorte Kopie, Versionspin `v4.8.4`, Lizenz MIT) | Ladder-Verfahren gegen Over-Engineering | 2026-08-08 (per `git log --diff-filter=A -1 --format=%as -- .claude/skills/ponytail/SKILL.md`) | [Annahme] vor diesem Programm übernommen, keine Prüfspur über den Skill `werkzeug-auswahl` gefunden |
+| `.claude/skills/ponytail/` (vendorte Kopie, Versionspin `v4.8.4`, Lizenz MIT) | Ladder-Verfahren gegen Over-Engineering | 2026-09-08 (per `git log --diff-filter=A -1 --format=%as -- .claude/skills/ponytail/SKILL.md`, Commit `17b4b3a`) | [Annahme] vor diesem Programm übernommen, keine Prüfspur über den Skill `werkzeug-auswahl` gefunden — Datum stammt aus der Historie des Templates, nicht aus einer echten Einführung an diesem Tag |
 
 ## Bewusst nicht installiert
 
