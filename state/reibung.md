@@ -24,3 +24,4 @@ Ein Eintrag ist eine Zeile, kein Aufsatz.
 |---|---|---|---|---|
 | [FÜLLUNG] | | | | |
 | 2026-09-08 | commit-guard blockt jeden Bash-Befehl, dessen Text `.claude/settings.json` enthält — auch das harmlose `git status` im selben Verbundbefehl; die Datei ist über Claude Code nicht committebar | `.claude/hooks/commit-guard.js`, Zeile 150 | ~20 min | ja, Commit vom Menschen im eigenen Terminal |
+| 2026-09-09 | Freigabe für jeden Git-Vorgang von Hand im Editor anlegen, Zeitstempel abtippen, zweimal pro Iteration (commit + push) — funktioniert, ist aber unnötig umständlich | `state/freigabe-commit.md` / `.claude/hooks/commit-guard.js` | ~2 min je Iteration | ja — Shell-Funktion `freigabe()` in `~/.bashrc`: zeigt `git diff --staged --stat`, fragt nach, schreibt dann den Zeitstempel. Das Gate bleibt intakt, weil die Funktion in der eigenen Shell läuft und nicht vom Modell aufgerufen werden kann. Wäre ein guter Vorschlag ans Template |
