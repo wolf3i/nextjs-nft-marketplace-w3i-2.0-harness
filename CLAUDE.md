@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Pflichtlektüre
+
+Lies `ARCHITECTURE.md` bevor du Code schreibst. Alle Konventionen dort sind
+verbindlich. Aktueller Phasenstand und Scope: siehe `docs/STATUS.md`.
+
 ## Commands
 
 ```bash
@@ -85,3 +90,118 @@ Stateless, framework-agnostic business logic — never hold React state here, ne
 - `docs/database/README.md` and `docs/database/schemas/` — collection schemas.
 - `docs/development/setup.md` — environment setup.
 - Several subfolders (`src/lib/`, `src/contexts/`, `src/services/`) have their own `README.md` with quick-reference usage examples for that layer.
+
+## Arbeitsweise — IMMER einhalten
+
+### Vor jeder Aufgabe: Briefing
+```
+1. Ziel der Iteration
+2. Relevante Referenz (Design-Screenshot, Spec-Datei — je nach Projekt)
+3. Komponenten/Module und Datenbedarf
+4. Zustände: Default / Leer / Ladend / Fehler / Hover
+5. Akzeptanzkriterien
+6. Risiken
+```
+
+### Iterationsprinzip
+- Jede Iteration ist klein, prüfbar und abgeschlossen.
+- Keine großen Funktionspakete auf einmal. Erst planen, dann umsetzen.
+- Ein Task nach dem anderen pro Arbeitsverzeichnis — mehrere
+  Arbeitsverzeichnisse (Worktrees) dürfen parallel laufen.
+- Ein Schreiber pro Arbeitsverzeichnis. Keine zweite Sitzung im selben
+  Ordner; parallele Arbeit nur in getrennten git-Worktrees.
+- Ein Zielverzeichnis pro Auftrag. Hat eine Sitzung Zugriff auf mehrere
+  Ordner, benennt jeder Auftrag sein Zielverzeichnis ausdrücklich und
+  beginnt mit einer Prüfung des Arbeitsverzeichnisses — passt es nicht,
+  wird abgebrochen statt gewechselt. Jeder Befehlsblock beginnt mit `cd`
+  auf den vollständigen Pfad, nie mit einem relativen Sprung. Das gilt für
+  Mensch und Modell gleichermaßen: Ein verfügbarer Zweitordner ist bequem
+  und genau deshalb gefährlich.
+- Iterationsende heißt: `git status` prüfen, Freigabe einholen, committen
+  UND pushen (Skill `git-flow`). Eine Bremse ohne Gaspedal erzeugt Halden.
+- Keine Versionsnummern in Prosa. Versionen stehen ausschließlich in der
+  Paketdatei des Stacks.
+- Zuschnitt-Heuristik für Handoff-Verträge: ein Baudurchgang plus höchstens
+  eine Korrekturrunde ohne Eskalation, mit eigenständig prüfbarem Artefakt
+  (Test + grünes `npm run check`). Abhängigkeit von einer vorherigen Phase
+  ist kein Zuschnittsfehler, solange sie im CONTEXT-Abschnitt explizit
+  benannt ist.
+
+### Definition of Done
+- [ ] Komponenten/Module sind wiederverwendbar
+- [ ] Typisiert, kein neues `any` in geändertem Code (Geltungsgrenze: der
+      Bestand hat 206 vorhandene `any`-Vorkommen, davon 24 in den Dateien,
+      die die aktuelle Migration umbaut — ohne diese Grenze wäre die
+      Checkbox eine Ermessensfrage)
+- [ ] Fehlerzustände berücksichtigt (catch + Logging)
+- [ ] Leere Zustände berücksichtigt
+- [ ] Lange Texte zerstören das Layout nicht
+- [ ] Mobile Darstellung berücksichtigt; jeder Container mit max-width hat
+      auch width: 100%
+- [ ] Design bleibt treu (Design-Tokens, keine neuen Farben/Schatten ohne
+      Freigabe)
+- [ ] Code ist sinnvoll kommentiert (Datei-Header + Funktionsdoku, siehe
+      `docs/kommentar-standard.md`)
+- [ ] `npm run check` → Exit 0
+- [ ] KEINE Commits ohne explizite Freigabe
+
+## Prüfrollen als Subagenten
+
+Liegen als echte Subagenten in `.claude/agents/`: eigener Kontext, keine
+Schreibrechte (`tools: Read, Grep, Glob`). Sie werden nicht gelesen, sondern
+delegiert.
+
+| Rolle | Wofür |
+|---|---|
+| `architecture-advisor` | Pläne VOR dem Bau prüfen |
+| `code-reviewer` | Code nach dem Bauen prüfen |
+| `qa` | Akzeptanztests und Randfälle definieren |
+
+Sie können ihre Befunde nicht selbst wegräumen — das ist Absicht. Ein
+Prüfer mit Schreibrechten wird heimlich zum Autor.
+
+## Entscheidungsregel bei Unsicherheit
+
+1. Design-Referenz respektieren
+2. Aktuellen Scope laut `docs/STATUS.md` einhalten
+3. Wartbarkeit bevorzugen
+4. Komplexität reduzieren
+5. Entscheidung dokumentieren — niemals stillschweigend in Code verwandeln
+
+## Status-Format (Jede Ausgabe endet damit)
+
+```
+## Status
+- [ ] Freigegeben
+- [ ] Freigegeben mit Hinweisen
+- [ ] Nicht freigegeben
+- [ ] Blockiert
+
+## Nächster sinnvoller Schritt
+...
+```
+
+## Bekannte Fallen
+
+Entwickelt wird unter WSL im Linux-Dateisystem, Host ist Windows. Von den
+umgebungsbedingten Fallen einer Windows/WSL-Entwicklung ist hier nur eine
+relevant — kein cloudsynchronisierter Ordner (OneDrive/Dropbox) im Spiel,
+also entfällt die dortige Reparse-Point-Falle.
+
+- Symptom: `git status` meldet Dutzende unangetasteter Dateien als
+  geändert, der Diff zeigt jede Zeile als ersetzt — tritt auf, wenn
+  dasselbe Repo aus einer Linux-Umgebung betrachtet wird (gemountetes
+  Windows-Verzeichnis). Ursache: Arbeitskopie hat CRLF, die Git-Datenbank
+  LF, `core.autocrlf` dort nicht gesetzt.
+- Was tun: Nicht von der Linux-Seite aus stagen oder committen. Windows-Git
+  ist die maßgebliche Sicht. Gegenprüfen: `git diff --ignore-cr-at-eol`
+  oder `file <datei>` gegen `git show HEAD:<datei> | cat -A`.
+
+- Symptom: Ein Test-/Gate-Lauf scheitert einmalig ohne erkennbaren Grund
+  (kein Code, keine Config geändert) und läuft beim nächsten Versuch grün.
+- Was tun: Erst wiederholen, bevor man etwas repariert. Tritt es erneut
+  auf: Uhrzeit, Umgebungszustand (z. B. laufende Cloud-Sync) festhalten —
+  ohne diese Angaben bleibt der Fehler unerklärbar.
+
+- Projektspezifische Fallen hier ergänzen, sobald sie zweimal aufgetreten
+  sind. Eine einmalige Beobachtung ist noch kein Muster.

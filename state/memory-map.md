@@ -29,4 +29,5 @@ derselbe Fakt an drei Stellen im Quell-Projekt dieses Templates).
 | Abgespaltener Architektur-Teilbereich | eigene Datei plus memory-map-Zeile plus Rückverweis aus `ARCHITECTURE.md` | keine Abspaltung ohne die drei Bedingungen aus der Aufteilungsregel (`ARCHITECTURE.md`, Kopfkommentar) |
 | Datenbankschema | erzeugt aus den Migrationen | keine von Hand gepflegte Schema-Datei unter `docs/` |
 | API-Vertrag | erzeugt aus dem Code | keine von Hand gepflegte API-Datei unter `docs/`. Was an beiden **Regel** ist (Namenskonvention, wer darf schreiben, Versionierung, Fehlerformat), bleibt in `ARCHITECTURE.md` |
+| Architektur einzelner Routen (`/sell`, `/history-towers`) | `src/app/sell/ARCHITECTURE.md`, `src/app/history-towers/ARCHITECTURE.md` | nicht in die Wurzel-`ARCHITECTURE.md` — die regelt nur projektweite Konventionen, verweist aber auf diese beiden zurück |
 | [FÜLLUNG] | | |
