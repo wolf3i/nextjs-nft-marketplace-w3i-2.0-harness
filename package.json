@@ -8,7 +8,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "dev:clean": "taskkill /F /IM node.exe /T 2>nul || echo No processes killed & npm run dev",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
@@ -39,7 +38,8 @@
     "migrate:clean-marketplace": "curl -X POST http://localhost:3000/api/admin/migrate/clean-marketplace-items",
     "migrate:rename-fields": "curl -X POST http://localhost:3000/api/admin/migrate/rename-to-contractAddress",
     "migrate:rename-likes": "curl -X POST http://localhost:3000/api/admin/migrate/rename-favorites-to-likes",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\""
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "check": "npm run lint && npm run typecheck && node scripts/check-docs.mjs && node scripts/check-rules.mjs && node scripts/check-contract.mjs && npm run test:run"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",

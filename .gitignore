@@ -23,9 +23,6 @@
 # vscode
 .vscode/
 
-# claude
-.claude/
-
 # misc
 .DS_Store
 *.pem
@@ -42,6 +39,20 @@ yarn-error.log*
 .env.local
 .env*.local
 .env-old/
+
+# Persönliche Freigaben — trägt Freigaben, die nie reviewt werden.
+# MUSS ignoriert bleiben (siehe SETUP.md Punkt 7 / Befund G10).
+.claude/settings.local.json
+
+# Aufgaben-Gedächtnis — bewusst nicht committet, nur die Vorlage bleibt
+# getrackt (state/zwischenstand/VORLAGE.md via Ausnahme unten).
+state/zwischenstand/*.md
+!state/zwischenstand/VORLAGE.md
+
+# Einmal-Freigabe für den Commit-Guard (.claude/hooks/commit-guard.js) —
+# ephemer, ein personenbezogener Freigabe-Vorgang für genau einen Commit.
+# Nie committen: Läge sie im Repo, wäre sie kein zweiter Schlüssel mehr.
+state/freigabe-commit.md
 
 # vercel
 .vercel
