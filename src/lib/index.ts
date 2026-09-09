@@ -71,8 +71,8 @@ export {
 export { cn } from './utils';
 
 // === MONGODB CONNECTION ===
-export { default as clientPromise } from './mongodb';
 export {
+    getClientPromise,
     connectToDatabase,
     getDatabase,
     getCollection,

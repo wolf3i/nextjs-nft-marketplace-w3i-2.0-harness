@@ -1,0 +1,201 @@
+Baseline-Erhebung der Prüfkette `npm run check` — Phase 1 (Harness-Skelett)
+Erhoben am: 2026-09-08
+Repo: /home/wolfgang/w3i/nextjs-nft-marketplace-w3i-2.0-harness
+Branch: harness/phase1-skelett
+
+Vorgehen laut Vertrag (state/tasks/harness-phase1-skelett.md, SCOPE Punkt 8):
+jedes der sechs Kettenglieder wurde EINZELN ausgeführt und protokolliert,
+weil die Kette mit `&&` verknüpft ist und beim ersten roten Glied abbricht.
+Danach zusätzlich `npm run check` als Ganzes, um das Kettenverhalten selbst
+zu belegen.
+
+================================================================================
+Glied 1/6: npm run lint
+================================================================================
+Befehl: npm run lint
+Exit-Code: 0
+
+--- Ausgabe ---
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 lint
+> eslint
+
+--- Ende Ausgabe ---
+
+================================================================================
+Glied 2/6: npm run typecheck
+================================================================================
+Befehl: npm run typecheck
+Exit-Code: 0
+
+--- Ausgabe ---
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 typecheck
+> tsc --noEmit
+
+--- Ende Ausgabe ---
+
+================================================================================
+Glied 3/6: node scripts/check-docs.mjs
+================================================================================
+Befehl: node scripts/check-docs.mjs
+Exit-Code: 1
+
+--- Ausgabe ---
+=== Doku-Check ===
+
+✗ 3 Befund(e):
+
+  - CLAUDE.md:56: Verweis auf `NextResponse.json` — Datei existiert nirgends im Repo
+  - README.md:437: Verweis auf `src/lib/config.ts` — Datei existiert nicht
+  - CLAUDE.md:33: Versionsnummer "20.19.0" — Versionen gehören nur in die Paketdatei
+
+--- Ende Ausgabe ---
+
+Hinweis: Rotes Ergebnis ist hier das erwartete Ergebnis, kein Fehlschlag
+(siehe Vertrag, GOAL-Abschnitt). Die Behebung dieser drei Befunde ist der
+Folgeauftrag state/tasks/harness-phase2-check-gruen.md, nicht dieser
+Vertrag.
+
+================================================================================
+Glied 4/6: node scripts/check-rules.mjs
+================================================================================
+Befehl: node scripts/check-rules.mjs
+Exit-Code: 0
+
+--- Ausgabe ---
+=== Regel-Check ===
+
+ⓘ Keine Regeln registriert — leerer Harness (siehe SETUP.md Punkt 4).
+
+--- Ende Ausgabe ---
+
+================================================================================
+Glied 5/6: node scripts/check-contract.mjs
+================================================================================
+Befehl: node scripts/check-contract.mjs
+Exit-Code: 0
+
+--- Ausgabe ---
+=== Vertrags-Check ===
+
+✓ 1 Vertrag/Verträge geprüft, keine Befunde.
+
+--- Ende Ausgabe ---
+
+Hinweis: Dies ist der erste belegte Grün-Fall dieses Gates — geprüft wird
+state/tasks/harness-phase1-skelett.md selbst (die einzige Datei in
+state/tasks/), und der Check läuft grün über ihre eigene Präambel und die
+acht Pflichtmarker.
+
+================================================================================
+Glied 6/6: npm run test:run
+================================================================================
+Befehl: npm run test:run
+Exit-Code: 0
+
+--- Ausgabe ---
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 test:run
+> vitest run
+
+ RUN  v4.0.18 /home/wolfgang/w3i/nextjs-nft-marketplace-w3i-2.0-harness
+
+ ✓ src/app/history-towers/__tests__/TowerPhysicsEngine.test.ts (20 tests) 12ms
+ ✓ src/lib/middleware/__tests__/auth.test.ts (10 tests) 112ms
+ ✓ src/components/nft/NFTCard/NFTCardPrice.test.tsx (6 tests) 54ms
+ ✓ src/app/api/auth/session/route.test.ts (4 tests) 348ms
+     ✓ returns unauthenticated when no cookie 323ms
+ ✓ src/app/api/auth/verify/route.test.ts (5 tests) 373ms
+     ✓ rejects missing fields 336ms
+
+ Test Files  5 passed (5)
+      Tests  45 passed (45)
+   Start at  16:08:21
+   Duration  1.29s (transform 796ms, setup 769ms, import 562ms, tests 900ms, environment 2.72s)
+
+--- Ende Ausgabe ---
+
+================================================================================
+Gesamtlauf: npm run check (als Ganzes, zur Beobachtung des Kettenverhaltens)
+================================================================================
+Befehl: npm run check
+Exit-Code: 1
+Abbruchstelle: nach Glied 2 (typecheck), bei Glied 3 (check-docs.mjs) —
+die Kette bricht dort mit Exit 1 ab; Glieder 4-6 (check-rules.mjs,
+check-contract.mjs, test:run) werden in diesem Gesamtlauf NICHT erreicht.
+Das bestätigt, warum die Einzelläufe oben nötig waren: ein `npm run check`
+allein hätte keine vollständige Baseline geliefert.
+
+--- Ausgabe ---
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 check
+> npm run lint && npm run typecheck && node scripts/check-docs.mjs && node scripts/check-rules.mjs && node scripts/check-contract.mjs && npm run test:run
+
+
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 lint
+> eslint
+
+
+> nextjs-nft-marketplace-w3i-2.0@0.1.0 typecheck
+> tsc --noEmit
+
+
+=== Doku-Check ===
+
+✗ 3 Befund(e):
+
+  - CLAUDE.md:56: Verweis auf `NextResponse.json` — Datei existiert nirgends im Repo
+  - README.md:437: Verweis auf `src/lib/config.ts` — Datei existiert nicht
+  - CLAUDE.md:33: Versionsnummer "20.19.0" — Versionen gehören nur in die Paketdatei
+
+--- Ende Ausgabe ---
+
+================================================================================
+Zusammenfassung
+================================================================================
+| # | Kettenglied              | Exit-Code |
+|---|---------------------------|-----------|
+| 1 | npm run lint              | 0         |
+| 2 | npm run typecheck          | 0         |
+| 3 | node scripts/check-docs.mjs | 1       |
+| 4 | node scripts/check-rules.mjs | 0      |
+| 5 | node scripts/check-contract.mjs | 0  |
+| 6 | npm run test:run           | 0         |
+| — | npm run check (Gesamtlauf)  | 1 (bricht bei Glied 3 ab) |
+
+================================================================================
+Nachlauf nach Phase 2a
+================================================================================
+Erhoben am: 2026-09-08
+Auftrag: state/tasks/harness-phase2a-check-gruen.md
+Änderungen: README.md:437 (Verweis + Codeblock auf src/config/networks.ts
+korrigiert), CLAUDE.md:56 (check-docs-ignore: für NextResponse.json-
+Falschtreffer), CLAUDE.md:33 (Versionsnummer entfernt, Verweis auf engines/
+.nvmrc behalten).
+
+Befehl: npm run check
+Exit-Code: 0
+
+--- Ausgabe (gekürzt auf die relevanten Abschnitte) ---
+> npm run lint && npm run typecheck && node scripts/check-docs.mjs &&
+> node scripts/check-rules.mjs && node scripts/check-contract.mjs &&
+> npm run test:run
+
+=== Doku-Check ===
+
+✓ Keine Befunde.
+
+=== Regel-Check ===
+
+ⓘ Keine Regeln registriert — leerer Harness (siehe SETUP.md Punkt 4).
+
+=== Vertrags-Check ===
+
+✓ 2 Vertrag/Verträge geprüft, keine Befunde.
+
+Test Files  5 passed (5)
+     Tests  45 passed (45)
+
+--- Ende Ausgabe ---
+
+Ergebnis: Alle sechs Kettenglieder grün, `npm run check` Exit 0.
+Das rote Kettenglied aus der Phase-1-Baseline (`node scripts/check-docs.mjs`,
+drei Befunde) ist behoben und einzeln nachgeprüft (siehe Ausgabe oben,
+Exit 0, „Keine Befunde.").

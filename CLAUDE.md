@@ -2,6 +2,11 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Pflichtlektüre
+
+Lies `ARCHITECTURE.md` bevor du Code schreibst. Alle Konventionen dort sind
+verbindlich. Aktueller Phasenstand und Scope: siehe `docs/STATUS.md`.
+
 ## Commands
 
 ```bash
@@ -30,7 +35,7 @@ npm run env:check               # Validate required env vars are set
 npm run env:check:prod          # Same, against production requirements
 ```
 
-Node >= 20.19.0 is required (`engines` in package.json; `.nvmrc` pins the dev version).
+Node version: see `engines` in `package.json` and `.nvmrc` for the pinned dev version.
 
 ## Architecture
 
@@ -53,7 +58,7 @@ When adding a feature that reads NFT data, prefer reading from `nft_metadata` (v
 
 ### API layer: `apiHandler` + middleware, always
 
-Every route in `src/app/api/**/route.ts` is wrapped in `apiHandler()` (`src/lib/api/handler.ts`), which handles error formatting, logging, rate limiting, and CORS. Don't hand-roll try/catch + `NextResponse.json` in a route — throw a typed error instead. Quick-reference examples and the full middleware list (`withAuth`, `withAdmin`, `withValidation`, `rateLimit`) are in `src/lib/README.md`; rate-limit tiers are in `docs/api/routes.md`; the admin signature/session flow is in `docs/api/authentication.md`.
+Every route in `src/app/api/**/route.ts` is wrapped in `apiHandler()` (`src/lib/api/handler.ts`), which handles error formatting, logging, rate limiting, and CORS. Don't hand-roll try/catch + `NextResponse.json` in a route — throw a typed error instead. <!-- check-docs-ignore: NextResponse.json ist ein Methodenaufruf, kein Dateiname --> Quick-reference examples and the full middleware list (`withAuth`, `withAdmin`, `withValidation`, `rateLimit`) are in `src/lib/README.md`; rate-limit tiers are in `docs/api/routes.md`; the admin signature/session flow is in `docs/api/authentication.md`.
 
 Admin routes (`/admin/*`, `/api/admin/*`, `/api/nft/admin/*`) are additionally gated at the edge by `middleware.ts`, which verifies the `admin-session` JWT cookie before the request even reaches the route handler.
 
@@ -85,3 +90,114 @@ Stateless, framework-agnostic business logic — never hold React state here, ne
 - `docs/database/README.md` and `docs/database/schemas/` — collection schemas.
 - `docs/development/setup.md` — environment setup.
 - Several subfolders (`src/lib/`, `src/contexts/`, `src/services/`) have their own `README.md` with quick-reference usage examples for that layer.
+
+## Arbeitsweise — IMMER einhalten
+
+### Vor jeder Aufgabe: Briefing
+```
+1. Ziel der Iteration
+2. Relevante Referenz (Design-Screenshot, Spec-Datei — je nach Projekt)
+3. Komponenten/Module und Datenbedarf
+4. Zustände: Default / Leer / Ladend / Fehler / Hover
+5. Akzeptanzkriterien
+6. Risiken
+```
+
+### Iterationsprinzip
+- Jede Iteration ist klein, prüfbar und abgeschlossen.
+- Keine großen Funktionspakete auf einmal. Erst planen, dann umsetzen.
+- Ein Task nach dem anderen pro Arbeitsverzeichnis — mehrere
+  Arbeitsverzeichnisse (Worktrees) dürfen parallel laufen.
+- Ein Schreiber pro Arbeitsverzeichnis. Keine zweite Sitzung im selben
+  Ordner; parallele Arbeit nur in getrennten git-Worktrees.
+- Ein Zielverzeichnis pro Auftrag. Hat eine Sitzung Zugriff auf mehrere
+  Ordner, benennt jeder Auftrag sein Zielverzeichnis ausdrücklich und
+  beginnt mit einer Prüfung des Arbeitsverzeichnisses — passt es nicht,
+  wird abgebrochen statt gewechselt. Jeder Befehlsblock beginnt mit `cd`
+  auf den vollständigen Pfad, nie mit einem relativen Sprung. Das gilt für
+  Mensch und Modell gleichermaßen: Ein verfügbarer Zweitordner ist bequem
+  und genau deshalb gefährlich.
+- Iterationsende heißt: `git status` prüfen, Freigabe einholen, committen
+  UND pushen (Skill `git-flow`). Eine Bremse ohne Gaspedal erzeugt Halden.
+- Keine Versionsnummern in Prosa. Versionen stehen ausschließlich in der
+  Paketdatei des Stacks.
+- Zuschnitt-Heuristik für Handoff-Verträge: ein Baudurchgang plus höchstens
+  eine Korrekturrunde ohne Eskalation, mit eigenständig prüfbarem Artefakt
+  (Test + grünes `npm run check`). Abhängigkeit von einer vorherigen Phase
+  ist kein Zuschnittsfehler, solange sie im CONTEXT-Abschnitt explizit
+  benannt ist.
+
+### Definition of Done
+- [ ] Komponenten/Module sind wiederverwendbar
+- [ ] Typisiert, kein neues `any` in geändertem Code (Geltungsgrenze: der
+      Bestand hat 206 vorhandene `any`-Vorkommen, davon 24 in den Dateien,
+      die die aktuelle Migration umbaut — ohne diese Grenze wäre die
+      Checkbox eine Ermessensfrage)
+- [ ] Fehlerzustände berücksichtigt (catch + Logging)
+- [ ] Leere Zustände berücksichtigt
+- [ ] Lange Texte zerstören das Layout nicht
+- [ ] Mobile Darstellung berücksichtigt; jeder Container mit max-width hat
+      auch width: 100%
+- [ ] Code ist sinnvoll kommentiert (Datei-Header + Funktionsdoku, siehe
+      `docs/kommentar-standard.md`)
+- [ ] `npm run check` → Exit 0
+- [ ] KEINE Commits ohne explizite Freigabe
+
+## Prüfrollen als Subagenten
+
+Liegen als echte Subagenten in `.claude/agents/`: eigener Kontext, keine
+Schreibrechte (`tools: Read, Grep, Glob`). Sie werden nicht gelesen, sondern
+delegiert.
+
+| Rolle | Wofür |
+|---|---|
+| `architecture-advisor` | Pläne VOR dem Bau prüfen |
+| `code-reviewer` | Code nach dem Bauen prüfen |
+| `qa` | Akzeptanztests und Randfälle definieren |
+
+Sie können ihre Befunde nicht selbst wegräumen — das ist Absicht. Ein
+Prüfer mit Schreibrechten wird heimlich zum Autor.
+
+## Entscheidungsregel bei Unsicherheit
+
+1. Aktuellen Scope laut `docs/STATUS.md` einhalten
+2. Wartbarkeit bevorzugen
+3. Komplexität reduzieren
+4. Entscheidung dokumentieren — niemals stillschweigend in Code verwandeln
+
+## Status-Format (Jede Ausgabe endet damit)
+
+```
+## Status
+- [ ] Freigegeben
+- [ ] Freigegeben mit Hinweisen
+- [ ] Nicht freigegeben
+- [ ] Blockiert
+
+## Nächster sinnvoller Schritt
+...
+```
+
+## Bekannte Fallen
+
+Entwickelt wird unter WSL im Linux-Dateisystem, Host ist Windows. Die
+umgebungsbedingten Fallen einer Windows/WSL-Entwicklung greifen hier derzeit
+alle nicht: kein cloudsynchronisierter Ordner (OneDrive/Dropbox) im Spiel, und
+das Repo liegt nicht auf einem Windows-Mount. Sie stehen unten trotzdem, weil
+sie wieder gelten, sobald sich der Ablageort ändert.
+
+- Symptom: `git status` meldet Dutzende unangetasteter Dateien als geändert,
+  der Diff zeigt jede Zeile als ersetzt.
+- Gilt hier NICHT, solange das Repo im WSL-Dateisystem liegt (`/home/...`).
+  Windows-Git greift dann nie darauf zu. Relevant würde die Falle erst bei
+  einem Repo unter `/mnt/c/...`. Vorsorge liegt bereits im Repo:
+  `.gitattributes` mit `* text=auto eol=lf`.
+
+- Symptom: Ein Test-/Gate-Lauf scheitert einmalig ohne erkennbaren Grund
+  (kein Code, keine Config geändert) und läuft beim nächsten Versuch grün.
+- Was tun: Erst wiederholen, bevor man etwas repariert. Tritt es erneut
+  auf: Uhrzeit, Umgebungszustand (z. B. laufende Cloud-Sync) festhalten —
+  ohne diese Angaben bleibt der Fehler unerklärbar.
+
+- Projektspezifische Fallen hier ergänzen, sobald sie zweimal aufgetreten
+  sind. Eine einmalige Beobachtung ist noch kein Muster.
