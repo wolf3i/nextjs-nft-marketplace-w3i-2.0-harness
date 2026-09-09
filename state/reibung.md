@@ -23,3 +23,4 @@ Ein Eintrag ist eine Zeile, kein Aufsatz.
 | Datum | Was hat aufgehalten | Wo (Datei/Schritt) | Kosten (grob) | Erledigt? |
 |---|---|---|---|---|
 | [FÜLLUNG] | | | | |
+| 2026-09-08 | commit-guard blockt jeden Bash-Befehl, dessen Text `.claude/settings.json` enthält — auch das harmlose `git status` im selben Verbundbefehl; die Datei ist über Claude Code nicht committebar | `.claude/hooks/commit-guard.js`, Zeile 150 | ~20 min | ja, Commit vom Menschen im eigenen Terminal |
