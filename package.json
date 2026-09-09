@@ -39,7 +39,7 @@
     "migrate:rename-fields": "curl -X POST http://localhost:3000/api/admin/migrate/rename-to-contractAddress",
     "migrate:rename-likes": "curl -X POST http://localhost:3000/api/admin/migrate/rename-favorites-to-likes",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "check": "npm run lint && npm run typecheck && node scripts/check-docs.mjs && node scripts/check-rules.mjs && node scripts/check-contract.mjs && npm run test:run"
+    "check": "npm run lint && npm run typecheck && node scripts/check-docs.mjs && node scripts/check-rules.mjs && node scripts/check-contract.mjs && node scripts/check-secrets.mjs && npm run test:run"
   },
   "dependencies": {
     "@apollo/client": "^3.14.0",
