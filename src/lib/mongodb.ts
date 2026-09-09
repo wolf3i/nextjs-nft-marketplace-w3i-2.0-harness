@@ -1,11 +1,26 @@
+/**
+ * Datei: src/lib/mongodb.ts
+ *
+ * Zweck: Zentraler MongoDB-Zugang. Stellt eine einmalig aufgebaute, geteilte
+ * Client-Verbindung sowie Hilfsfunktionen für Datenbank, Collections und
+ * Index-Setup bereit.
+ *
+ * Wird aufgerufen von:
+ * - src/lib/db/*, src/services/*, src/app/api/**\/route.ts und weiteren
+ *   serverseitigen Modulen über die benannten Exporte.
+ *
+ * Wichtig:
+ * Die Initialisierung ist verzögert: Verbindungsaufbau und der Fehler bei
+ * fehlender MONGODB_URI passieren erst beim ersten echten Datenbankzugriff
+ * über getClientPromise(), nicht schon beim Import. Sonst startet jedes
+ * Modul, das diese Datei transitiv importiert, allein durchs Importieren eine
+ * Datenbankverbindung — was unter anderem `next build` ohne Zugangsdaten
+ * scheitern lässt.
+ */
+
 import { MongoClient, Db, MongoClientOptions } from 'mongodb';
 import { devLog } from '@/utils';
 
-if (!process.env.MONGODB_URI) {
-    throw new Error('Please add your MongoDB URI to .env.local');
-}
-
-const uri = process.env.MONGODB_URI;
 const directUri = process.env.MONGODB_URI_DIRECT;
 const options: MongoClientOptions = {
     retryWrites: true,
@@ -17,8 +32,7 @@ const options: MongoClientOptions = {
     connectTimeoutMS: 10000,
 };
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
+let clientPromise: Promise<MongoClient> | undefined;
 
 async function connectClientWithOptionalFallback(primaryUri: string): Promise<MongoClient> {
     const primaryClient = new MongoClient(primaryUri, options);
@@ -50,26 +64,44 @@ declare global {
     var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-if (process.env.NODE_ENV === 'development') {
-    // In development mode, use a global variable so that the value
-    // is preserved across module reloads caused by HMR (Hot Module Replacement).
-    if (!global._mongoClientPromise) {
-        global._mongoClientPromise = connectClientWithOptionalFallback(uri);
+/**
+ * Liefert die geteilte MongoClient-Verbindung und baut sie beim ersten Aufruf auf.
+ * Nachfolgende Aufrufe bekommen dasselbe Promise zurück.
+ * @returns Promise auf den verbundenen MongoClient
+ * @throws Error('Please add your MongoDB URI to .env.local') — synchron, nicht als
+ * abgelehntes Promise. Absicht: Aufrufer können den Aufruf vor ihr eigenes try ziehen
+ * und den Fehlertext unverändert durchreichen. `getClientPromise().catch(...)` fängt
+ * diesen Fall deshalb NICHT.
+ */
+export function getClientPromise(): Promise<MongoClient> {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+        throw new Error('Please add your MongoDB URI to .env.local');
     }
-    clientPromise = global._mongoClientPromise;
-} else {
-    // In production mode, it's best to not use a global variable.
-    clientPromise = connectClientWithOptionalFallback(uri);
-}
 
-// Export a module-scoped MongoClient promise. By doing this in a
-// separate module, the client can be shared across functions.
-export default clientPromise;
+    if (process.env.NODE_ENV === 'development') {
+        // In development mode, use a global variable so that the value
+        // is preserved across module reloads caused by HMR (Hot Module Replacement).
+        if (!global._mongoClientPromise) {
+            global._mongoClientPromise = connectClientWithOptionalFallback(uri);
+        }
+        return global._mongoClientPromise;
+    }
+
+    // In production mode, it's best to not use a global variable.
+    if (!clientPromise) {
+        clientPromise = connectClientWithOptionalFallback(uri);
+    }
+    return clientPromise;
+}
 
 // Helper function to get database (alias for backward compatibility)
 export async function connectToDatabase(): Promise<{ db: Db; client: MongoClient }> {
+    // Bewusst vor dem try: fehlt MONGODB_URI, soll der ursprüngliche Fehlertext
+    // durchkommen und nicht in einen MongoConnectionError umgeschrieben werden.
+    const pendingClient = getClientPromise();
     try {
-        const client = await clientPromise;
+        const client = await pendingClient;
         const db = client.db();
         return { db, client };
     } catch (error: any) {
@@ -80,8 +112,10 @@ export async function connectToDatabase(): Promise<{ db: Db; client: MongoClient
 
 // Helper function to get database
 export async function getDatabase(): Promise<Db> {
+    // Siehe connectToDatabase: der Fehler bei fehlender MONGODB_URI bleibt unverändert.
+    const pendingClient = getClientPromise();
     try {
-        const client = await clientPromise;
+        const client = await pendingClient;
         // Use the database name from the URI instead of hardcoding it
         return client.db(); // This will use the database name from the connection string
     } catch (error: any) {
@@ -92,6 +126,10 @@ export async function getDatabase(): Promise<Db> {
 
 // Helper function to get collection
 export async function getCollection(collectionName: string) {
+    // Wie in getDatabase: fehlt MONGODB_URI, soll der ursprüngliche Fehlertext durchkommen.
+    // Der Aufruf muss hier stehen und nicht im try — getDatabase() ist async und wirft nie
+    // synchron, seine Ablehnung würde der catch unten in einen MongoConnectionError umschreiben.
+    getClientPromise();
     try {
         const db = await getDatabase();
         return db.collection(collectionName);
