@@ -2,6 +2,8 @@
 
 Stand dieser Fassung: 09.09.2026
 Ist-Zustand erhoben gegen `harness/phase1-skelett`, Basis `e717a5d`.
+Plattformseite erhoben gegen `NiklasHoffmann/NFT-Data-Platform`, HEAD `7915b52`
+(03.09.2026).
 Evidenz-Marker: `[Fakt]` belegt · `[Schlussfolgerung]` abgeleitet ·
 `[Annahme]` ungeprüft · `[offene Unsicherheit]` ungeklärt.
 
@@ -69,6 +71,15 @@ am 03.09.2026.
 6. **`404` von der Plattform heißt „noch nicht indiziert",** nicht „Token
    existiert nicht".
 7. **Rollout über ein Feature-Flag** `NFT_DATA_PLATFORM_ENABLED`.
+8. **Der Marktplatz-Client bekommt nur die Scopes, die er braucht.** Die
+   Plattform kennt neun (`.env.example:39`); der Marktplatz liest und stößt
+   Auffrischungen an, mehr nicht. Also `collections:read`, `tokens:read`,
+   `owners:read`, `search:read`, `refresh:token`, `refresh:collection` — nicht
+   `reindex:write`, nicht `admin:read`, nicht `refresh:media`.
+9. **Integrationstests laufen gegen eine lokale Plattform-Instanz.** Das
+   Plattform-Repo bringt `docker-compose.yml` mit Mongo, Redis und MinIO mit
+   sowie eine vollständige `.env.example` samt Bootstrap-Client. Die Tests
+   hängen damit nicht an der Verfügbarkeit einer fremden Instanz.
 
 ---
 
@@ -112,38 +123,44 @@ am 03.09.2026.
 - **V14** `[neu]` `NFT_API_BASE_URL`, `NFT_API_CLIENT_ID`, `NFT_API_KEY` und
   `NFT_API_SECRET` existieren nur serverseitig, ohne `NEXT_PUBLIC_`-Spiegel.
   `npm run env:check` schlägt fehl, wenn das Flag an ist und eine davon fehlt.
+- **V15** `[neu]` Der verwendete API-Client trägt genau die sechs Scopes aus
+  Entscheidung 8. Ein Aufruf, der `reindex:write` oder `admin:read` bräuchte,
+  scheitert und wird nicht durch eine Erweiterung der Scopes gelöst.
+- **V16** `[neu]` Die Systemuhr des Marktplatz-Hosts läuft synchron. Die
+  Plattform weist Anfragen ab, deren Zeitstempel mehr als 300 Sekunden abweicht
+  (`AUTH_MAX_TIMESTAMP_SKEW_SEC`); ein Monitoring-Alarm auf Uhrdrift existiert.
 
 ### C — Betriebsreife
 
 Quelle: die offenen Punkte in `docs/development/PROJECT_CHECKLIST.md`.
 
-- **V15** `[neu]` Backup- und Restore-Plan ist dokumentiert und einmal
+- **V17** `[neu]` Backup- und Restore-Plan ist dokumentiert und einmal
   durchgespielt.
-- **V16** `[neu]` Background-Jobs haben Retry mit Backoff und melden dauerhaftes
+- **V18** `[neu]` Background-Jobs haben Retry mit Backoff und melden dauerhaftes
   Scheitern an das Monitoring.
-- **V17** `[neu]` Die MongoDB-Index-Strategie ist dokumentiert und angewandt.
-- **V18** `[neu]` Die Migrations-Strategie ist dokumentiert und einmal getestet.
-- **V19** `[neu]` Für jede externe Abhängigkeit ist dokumentiert, was bei Ausfall
+- **V19** `[neu]` Die MongoDB-Index-Strategie ist dokumentiert und angewandt.
+- **V20** `[neu]` Die Migrations-Strategie ist dokumentiert und einmal getestet.
+- **V21** `[neu]` Für jede externe Abhängigkeit ist dokumentiert, was bei Ausfall
   passiert.
-- **V20** `[neu]` Je Route existiert ein Performance-Budget, und
+- **V22** `[neu]` Je Route existiert ein Performance-Budget, und
   `npm run bench:api` prüft dagegen.
-- **V21** `[neu]` Der Release- und Versionierungs-Workflow ist dokumentiert.
+- **V23** `[neu]` Der Release- und Versionierungs-Workflow ist dokumentiert.
 
 ### D — Qualität
 
-- **V22** `[Bestand seit 08.09.2026]` `npm run check` endet mit Exit 0.
-- **V23** `[neu]` `vitest.config.ts` trägt eine Coverage-Schwelle, und die CI
+- **V24** `[Bestand seit 08.09.2026]` `npm run check` endet mit Exit 0.
+- **V25** `[neu]` `vitest.config.ts` trägt eine Coverage-Schwelle, und die CI
   wird rot, wenn sie unterschritten wird.
-- **V24** `[neu]` Geänderter Code enthält kein neues `any`. Der Altbestand von
+- **V26** `[neu]` Geänderter Code enthält kein neues `any`. Der Altbestand von
   206 Vorkommen ist davon ausgenommen.
-- **V25** `[neu]` Für jede migrierte Route existiert ein Integrationstest, für
+- **V27** `[neu]` Für jede migrierte Route existiert ein Integrationstest, für
   jeden Mapper ein Vertragstest.
 
 ### E — Mainnet
 
-- **V26** `[neu]` `NETWORK_CONFIG["1"].NftMarketplace` in
+- **V28** `[neu]` `NETWORK_CONFIG["1"].NftMarketplace` in
   `src/config/networks.ts` trägt eine echte Adresse statt des Nullplatzhalters.
-- **V27** `[neu]` Die in Commit `b6e0ca8` entfernten Zugangsdaten sind rotiert,
+- **V29** `[neu]` Die in Commit `b6e0ca8` entfernten Zugangsdaten sind rotiert,
   bevor echte Daten fließen.
 
 ---
@@ -172,10 +189,20 @@ Quelle: die offenen Punkte in `docs/development/PROJECT_CHECKLIST.md`.
   `*.deprecated` — von ESLint durchgesetzt.
 - `[Fakt]` Jede Änderung läuft über einen eigenen Branch, einen PR und ein
   grünes `npm run check`.
-- `[Fakt]` Die Plattform begrenzt pro API-Client, nicht pro Route. Eine
-  Detailseite löst mehrere Aufrufe aus (Token, Owner, Collection).
+- `[Fakt]` Die Plattform begrenzt pro API-Client, nicht pro Route. Das Limit
+  steht je Client in der Datenbank (`rateLimitPerMinute`,
+  `packages/db/src/index.ts:206`); der Bootstrap-Standard ist **300 Anfragen
+  pro Minute** (`.env.example:40`), für öffentliche Reads gilt getrennt 180.
+- `[Schlussfolgerung]` Eine Detailseite löst drei Aufrufe aus (Token, Owner,
+  Collection). Bei 300/min sind das rund 100 Detailaufrufe pro Minute. Für den
+  erwarteten Traffic ausreichend; die Marktplatz-Übersicht kommt mit ein bis
+  zwei Aufrufen aus, nicht mit einem je Karte.
 - `[Fakt]` Die Uhr des Marktplatz-Hosts muss synchron sein; die Plattform weist
-  Anfragen außerhalb von 300 Sekunden Abweichung ab.
+  Anfragen außerhalb von 300 Sekunden Abweichung ab
+  (`AUTH_MAX_TIMESTAMP_SKEW_SEC`, `.env.example:42`).
+- `[Fakt]` Eine vollständige Plattform-Instanz läuft lokal per
+  `docker compose` (Mongo, Redis, MinIO). Integrationstests hängen damit nicht
+  an einer fremden Instanz.
 
 ---
 
@@ -184,11 +211,25 @@ Quelle: die offenen Punkte in `docs/development/PROJECT_CHECKLIST.md`.
 1. `[offene Unsicherheit]` Weitere Aufgabenpunkte, die Wolfgang parallel
    zusammenstellt, sind hier noch nicht enthalten. Die Spec wird ergänzt, nicht
    ersetzt.
-2. `[offene Unsicherheit]` Das Rate-Limit-Budget der Plattform gegen die
-   erwarteten Seitenaufrufe ist nicht gerechnet. Ohne diese Zahl ist unklar, ob
-   die Detailseite in der geplanten Form tragfähig ist.
+2. `[offene Unsicherheit]` **Teilweise aufgelöst am 09.09.2026** durch Erhebung
+   im Plattform-Repo (siehe Constraints): Standard 300/min je Client,
+   konfigurierbar. Offen bleibt allein, was auf der **laufenden** Instanz
+   tatsächlich eingestellt ist und ob der Marktplatz dort einen eigenen Client
+   mit eigenem Limit bekommt. Frage liegt bei Niklas.
 3. `[offene Unsicherheit]` Ob `nft_metadata` nach dem Cutover ganz entfällt oder
    als Rückfallweg bleibt, ist nicht entschieden.
 4. `[offene Unsicherheit]` Zeitpunkt des Mainnet-Deploys und wer ihn auslöst.
-5. `[Annahme]` Die NFT Data Platform ist zum Zeitpunkt des Cutovers
-   betriebsbereit. Sie gilt als „fast fertig"; ein Termin ist nicht bekannt.
+5. `[offene Unsicherheit]` Wann die NFT Data Platform produktiv nutzbar ist und
+   was dafür noch fehlt. Das Repo (HEAD `7915b52`, 69 Commits) führt keine
+   Lückenliste und keinen Abschnitt zu offenen Punkten — die Antwort ist aus dem
+   Code nicht ableitbar. Frage liegt bei Niklas.
+6. `[offene Unsicherheit]` Ob es neben der lokalen Instanz eine geteilte
+   Staging-Instanz gibt. Für die Tests aus V27 nicht nötig, für einen realen
+   Vorab-Durchlauf schon.
+
+## Änderungsnachweis
+
+- 09.09.2026 — Entscheidungen 8 und 9, V15, V16 sowie vier Constraint-Zeilen
+  ergänzt nach Erhebung im Plattform-Repo `NiklasHoffmann/NFT-Data-Platform`,
+  HEAD `7915b52`. Offene Frage 2 dadurch weitgehend aufgelöst, Frage 5
+  präzisiert, Frage 6 neu. V-Nummern der Gruppen C bis E um zwei verschoben.
