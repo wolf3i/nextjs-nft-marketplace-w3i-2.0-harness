@@ -138,8 +138,6 @@ Stateless, framework-agnostic business logic — never hold React state here, ne
 - [ ] Lange Texte zerstören das Layout nicht
 - [ ] Mobile Darstellung berücksichtigt; jeder Container mit max-width hat
       auch width: 100%
-- [ ] Design bleibt treu (Design-Tokens, keine neuen Farben/Schatten ohne
-      Freigabe)
 - [ ] Code ist sinnvoll kommentiert (Datei-Header + Funktionsdoku, siehe
       `docs/kommentar-standard.md`)
 - [ ] `npm run check` → Exit 0
@@ -162,11 +160,10 @@ Prüfer mit Schreibrechten wird heimlich zum Autor.
 
 ## Entscheidungsregel bei Unsicherheit
 
-1. Design-Referenz respektieren
-2. Aktuellen Scope laut `docs/STATUS.md` einhalten
-3. Wartbarkeit bevorzugen
-4. Komplexität reduzieren
-5. Entscheidung dokumentieren — niemals stillschweigend in Code verwandeln
+1. Aktuellen Scope laut `docs/STATUS.md` einhalten
+2. Wartbarkeit bevorzugen
+3. Komplexität reduzieren
+4. Entscheidung dokumentieren — niemals stillschweigend in Code verwandeln
 
 ## Status-Format (Jede Ausgabe endet damit)
 
@@ -183,19 +180,18 @@ Prüfer mit Schreibrechten wird heimlich zum Autor.
 
 ## Bekannte Fallen
 
-Entwickelt wird unter WSL im Linux-Dateisystem, Host ist Windows. Von den
-umgebungsbedingten Fallen einer Windows/WSL-Entwicklung ist hier nur eine
-relevant — kein cloudsynchronisierter Ordner (OneDrive/Dropbox) im Spiel,
-also entfällt die dortige Reparse-Point-Falle.
+Entwickelt wird unter WSL im Linux-Dateisystem, Host ist Windows. Die
+umgebungsbedingten Fallen einer Windows/WSL-Entwicklung greifen hier derzeit
+alle nicht: kein cloudsynchronisierter Ordner (OneDrive/Dropbox) im Spiel, und
+das Repo liegt nicht auf einem Windows-Mount. Sie stehen unten trotzdem, weil
+sie wieder gelten, sobald sich der Ablageort ändert.
 
-- Symptom: `git status` meldet Dutzende unangetasteter Dateien als
-  geändert, der Diff zeigt jede Zeile als ersetzt — tritt auf, wenn
-  dasselbe Repo aus einer Linux-Umgebung betrachtet wird (gemountetes
-  Windows-Verzeichnis). Ursache: Arbeitskopie hat CRLF, die Git-Datenbank
-  LF, `core.autocrlf` dort nicht gesetzt.
-- Was tun: Nicht von der Linux-Seite aus stagen oder committen. Windows-Git
-  ist die maßgebliche Sicht. Gegenprüfen: `git diff --ignore-cr-at-eol`
-  oder `file <datei>` gegen `git show HEAD:<datei> | cat -A`.
+- Symptom: `git status` meldet Dutzende unangetasteter Dateien als geändert,
+  der Diff zeigt jede Zeile als ersetzt.
+- Gilt hier NICHT, solange das Repo im WSL-Dateisystem liegt (`/home/...`).
+  Windows-Git greift dann nie darauf zu. Relevant würde die Falle erst bei
+  einem Repo unter `/mnt/c/...`. Vorsorge liegt bereits im Repo:
+  `.gitattributes` mit `* text=auto eol=lf`.
 
 - Symptom: Ein Test-/Gate-Lauf scheitert einmalig ohne erkennbaren Grund
   (kein Code, keine Config geändert) und läuft beim nächsten Versuch grün.

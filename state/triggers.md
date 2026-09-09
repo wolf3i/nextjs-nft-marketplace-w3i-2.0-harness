@@ -19,4 +19,5 @@ ist (z. B. "diese Architekturentscheidung hat Nebenwirkungen").
 | Vor "fertig" | Aufgabe wirkt abgeschlossen | `qa`-Agent für Randfälle/Akzeptanztests | Agent |
 | Zyklus-Ende | Ein Lern-/Arbeitszyklus ist abgeschlossen | `HARNESS-LEARNING-STATE.md` + `HARNESS-CHANGELOG.md` nachtragen, noch vor dem nächsten Zyklus | Mensch |
 | Sitzungsunterbrechung mitten in einer Aufgabe | Kontext geht zu Ende oder Aufgabe wird pausiert | Zwischenstand in `state/zwischenstand/<branch>.md` schreiben | Mensch/Agent |
+| UI-Arbeit beginnt | Erste Aufgabe berührt sichtbare Oberfläche | Entscheiden, ob `design-guardian` und `docs/design-system.md` angelegt werden (SETUP.md Punkt 2) | Mensch |
 | [FÜLLUNG] | | | |
