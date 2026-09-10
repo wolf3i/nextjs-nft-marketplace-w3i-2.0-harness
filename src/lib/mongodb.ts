@@ -134,6 +134,13 @@ export async function getCollection(collectionName: string) {
         const db = await getDatabase();
         return db.collection(collectionName);
     } catch (error: any) {
+        // getDatabase() wirft bereits einen MongoConnectionError. Ein zweites Einpacken
+        // würde dessen aufbereitete Meldung (z. B. der Hinweis auf die IP-Whitelist) zum
+        // Eingabewert der Musterprüfung machen, die dann nicht mehr greift — der Hinweis
+        // ginge verloren. Deshalb hier unverändert weiterreichen.
+        if (error instanceof MongoConnectionError) {
+            throw error;
+        }
         throw new MongoConnectionError(error);
     }
 }
