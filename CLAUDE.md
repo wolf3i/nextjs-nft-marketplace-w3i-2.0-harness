@@ -15,10 +15,15 @@ npm run dev                    # Next.js dev server (Turbopack)
 npm run build                  # Production build
 npm start                      # Start production server
 
-# Quality gates (run all three before considering work done — CI runs the same)
+# Quality gate (must exit 0 before considering work done)
+npm run check                  # lint, typecheck, check-docs, check-rules, check-contract, check-secrets, test:run
+# CI runs `npm run check` and additionally: gitleaks secret scan, test:coverage,
+# dependency audit (npm audit --omit=dev --audit-level=critical), production build.
+
+# Single steps (all but test:coverage are part of `npm run check`)
 npm run lint                   # ESLint
 npm run typecheck              # tsc --noEmit
-npm run test:coverage          # Vitest with coverage
+npm run test:coverage          # Vitest with coverage (CI only)
 
 # Tests
 npm test                       # Vitest watch mode
@@ -66,7 +71,7 @@ Admin routes (`/admin/*`, `/api/admin/*`, `/api/nft/admin/*`) are additionally g
 
 State for each data domain lives under `src/contexts/<domain>/` following a consistent Context + Cache + Service split — domain list and usage examples in `src/contexts/README.md`.
 
-Cross-cutting cache invalidation goes through `src/services/validation/data-invalidation.ts` (`invalidateAfterListing`, `invalidateAfterPurchase`, `invalidateAllCachesForNFT`, etc.) and a `nft-stats-updated` / invalidation event system — mutating one collection's data without invalidating the related caches is a common source of stale-UI bugs here, so always route mutations through the existing invalidation helpers rather than updating context state directly.
+Cache invalidation has two layers, each with its own helpers. Client side: after a marketplace action (listing, purchase, cancel), context state is refreshed through the event helpers in `src/services/validation/data-invalidation.ts` (`invalidateAfterListing`, `invalidateAfterPurchase`, `invalidateAfterCancelListing`), which the contexts subscribe to via `onDataInvalidation` — updating context state directly instead is a common source of stale-UI bugs here. Server side: an API route that writes `nft_stats` clears the in-memory cache in `src/lib/cache.ts` afterwards (`invalidateAllCachesForNFT`, `invalidateStatsCache`). Not every write goes through these helpers — the worker's sync services write MongoDB directly; see `ARCHITECTURE.md` section 2 and `state/assumption-ledger.md`.
 
 ### Service layer (`src/services/`)
 
