@@ -4,7 +4,7 @@ Stabil halten — nur bei echten Struktur-Änderungen am Harness pflegen, nicht
 bei jedem Feature.
 Stand dieser Fassung: [FÜLLUNG — Datum bei erster echter Befüllung setzen]
 -->
-# Harness Overview — nextjs-nft-marketplace-w3i-2.0-harness
+# Harness Overview — nextjs-nft-marketplace-w3i-2.0
 
 Stabile Beschreibung, wie das Claude-Code-Harness dieses Projekts aufgebaut
 ist und zusammenspielt. Für Lernstand und offene Punkte siehe

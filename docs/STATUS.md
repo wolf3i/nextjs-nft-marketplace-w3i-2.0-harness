@@ -6,11 +6,11 @@ Einzige Quelle für Phasenstand und Scope des Harness. `CLAUDE.md` und
 
 ## Aktuelle Phase
 
-Phase 2c — Gates scharf. Die Prüfkette läuft unter demselben Namen lokal und
-in der CI, ein Secret-Gate und gitleaks sind ergänzt. Offen bleibt allein die
-Branch Protection auf `main`: sie ist eine GitHub-Einstellung und wird vom
-Menschen im Browser gesetzt, nachdem die CI einmal unter dem neuen Jobnamen
-gelaufen ist.
+Die Harness-Adaption ist mit Phase 3 abgeschlossen. Nächster Schritt ist keine
+Harness-Arbeit mehr, sondern die inhaltliche: die Spezifikation
+`specs/marktplatz-fertigstellung.md` fertigstellen, daraus Plan v1, Advisor-Pass
+(`architecture-advisor`), Plan v2, erst dann Arbeitspakete als
+Handoff-Verträge unter `state/tasks/`.
 
 ## Erledigt
 
@@ -24,12 +24,23 @@ gelaufen ist.
   gitleaks als CI-Schritt (Version gepinnt, kein Historien-Scan — begründet in
   `docs/adr/0001-kein-historien-scan.md`). Beide neuen Gates kalibriert in
   `state/gates.md` (`state/tasks/harness-phase2c-gates-scharf.md`).
+- Branch Protection auf `main` gesetzt und mit Gegentest belegt — Zeile
+  „Branch Protection" in `state/gates.md`.
+- MongoDB-Client verzögert initialisiert, Build läuft ohne Zugangsdaten
+  (`state/tasks/fix-mongodb-lazy-init.md`).
+- Phase 3a: Abhängigkeits-Sanierung als belegte Entscheidung zurückgestellt
+  (`docs/adr/0002-abhaengigkeiten-zurueckgestellt.md`), Dependency-Audit als
+  Gate (`state/tasks/harness-phase3a-betriebsreife.md`).
+- Phase 3b: Doku-Audit, Befunde in `state/repo-audit-befunde.md`; nur Klasse A
+  behoben (`state/tasks/harness-phase3b-doku-sanierung.md`).
 
 ## Offen
 
-- Branch Protection auf `main` (Ruleset mit Required Status Check `check`,
-  leere Bypass-Liste) — vom Menschen im Browser zu setzen, danach Gegentest
-  nach `state/gates.md`.
+- Doku-Befunde der Klasse B (Anweisungsdokumente, Gate-Lücken, tote Verweise
+  in Altdokumenten) und die nicht geprüften Dokumente: siehe
+  `state/repo-audit-befunde.md`.
+- Zurückgestellte Abhängigkeits-Sanierung, Vorbehalt vor Produktivbetrieb:
+  offen geführt in `state/assumption-ledger.md`.
 - Rotation der mit Commit `b6e0ca8` exponierten Zugangsdaten — offen geführt
   in `state/assumption-ledger.md`.
 - Fachlicher Scope (was am Marktplatz selbst gebaut wird): siehe

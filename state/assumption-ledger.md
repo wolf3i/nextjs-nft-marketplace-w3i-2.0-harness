@@ -1,5 +1,5 @@
 <!-- Ziel-Pfad im Repo: state/assumption-ledger.md -->
-# Assumption Ledger — nextjs-nft-marketplace-w3i-2.0-harness
+# Assumption Ledger — nextjs-nft-marketplace-w3i-2.0
 
 Jede Annahme, die getroffen wurde, weil eine sichere Klärung zu teuer oder
 nicht verfügbar war (`[Annahme]`-Marker aus einem Bericht) — mit Datum,

@@ -9,7 +9,7 @@ Zyklus-Ende committen, nicht als "eigener Schritt, falls nötig" vertagen.
 
 Stand dieser Fassung: [FÜLLUNG]
 -->
-# Harness Learning State — nextjs-nft-marketplace-w3i-2.0-harness
+# Harness Learning State — nextjs-nft-marketplace-w3i-2.0
 
 Diese Datei existiert PRO PROJEKT, nicht zentral über mehrere Projekte
 hinweg — auch wenn Funde und Fallen sich zwischen Projekten inhaltlich

@@ -1,5 +1,5 @@
 <!-- Ziel-Pfad im Repo: state/memory-map.md -->
-# Memory Map — nextjs-nft-marketplace-w3i-2.0-harness
+# Memory Map — nextjs-nft-marketplace-w3i-2.0
 
 Wo welche Art von Information zuhause ist — damit nichts doppelt und an
 zwei Stellen leicht widersprüchlich gepflegt wird (vgl. G7-Falle:
@@ -30,4 +30,5 @@ derselbe Fakt an drei Stellen im Quell-Projekt dieses Templates).
 | Datenbankschema | erzeugt aus den Migrationen | keine von Hand gepflegte Schema-Datei unter `docs/` |
 | API-Vertrag | erzeugt aus dem Code | keine von Hand gepflegte API-Datei unter `docs/`. Was an beiden **Regel** ist (Namenskonvention, wer darf schreiben, Versionierung, Fehlerformat), bleibt in `ARCHITECTURE.md` |
 | Architektur einzelner Routen (`/sell`, `/history-towers`) | `src/app/sell/ARCHITECTURE.md`, `src/app/history-towers/ARCHITECTURE.md` | nicht in die Wurzel-`ARCHITECTURE.md` — die regelt nur projektweite Konventionen, verweist aber auf diese beiden zurück |
+| Ergebnis eines Repo-Audits (Doku gegen Repo-Stand): Befunde mit Fundstelle und Klasse A/B/C | `state/repo-audit-befunde.md` (Momentaufnahme — ein neuer Audit ersetzt die Fassung) | keine Reibungsvorfälle (→ `state/reibung.md`), keine offenen Annahmen (→ `state/assumption-ledger.md`), keine Aufträge — ein Befund der Klasse B wird erst als `state/tasks/*.md` zur Arbeit; nicht als Anhänge-Protokoll fortschreiben |
 | [FÜLLUNG] | | |
