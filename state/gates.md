@@ -1,5 +1,5 @@
 <!-- Ziel-Pfad im Repo: state/gates.md -->
-# Objective Gates — nextjs-nft-marketplace-w3i-2.0-harness
+# Objective Gates — nextjs-nft-marketplace-w3i-2.0
 
 Jedes objektive (nicht-menschliche) Gate, das im Projekt läuft, mit
 Kalibrierung: mindestens ein bekannter Fall, der es auslöst (rot), und

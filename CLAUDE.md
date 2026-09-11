@@ -130,9 +130,13 @@ Stateless, framework-agnostic business logic — never hold React state here, ne
 ### Definition of Done
 - [ ] Komponenten/Module sind wiederverwendbar
 - [ ] Typisiert, kein neues `any` in geändertem Code (Geltungsgrenze: der
-      Bestand hat 206 vorhandene `any`-Vorkommen, davon 24 in den Dateien,
-      die die aktuelle Migration umbaut — ohne diese Grenze wäre die
-      Checkbox eine Ermessensfrage)
+      Altbestand ist ausgenommen — ohne diese Grenze wäre die Checkbox eine
+      Ermessensfrage)
+      > Messnotiz, keine Regel — Messung vom 10.09.2026: 206 Zeilen mit
+      > `: any` in den getrackten Dateien unter `src/`. Reproduzieren mit
+      > `git grep -nE ':[[:space:]]*any\b' -- 'src/*.ts' 'src/*.tsx' | wc -l`.
+      > Die Zahl veraltet mit jeder Änderung; sie beschreibt den Bestand,
+      > nicht die Geltungsgrenze.
 - [ ] Fehlerzustände berücksichtigt (catch + Logging)
 - [ ] Leere Zustände berücksichtigt
 - [ ] Lange Texte zerstören das Layout nicht

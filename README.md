@@ -261,27 +261,26 @@ nextjs-nft-marketplace-w3i-2.0/
 │   │   └── page.tsx          # Home page
 │   ├── components/            # React components
 │   │   ├── core/             # Core reusable components
-│   │   │   ├── BaseCard.tsx  # Standardized card component
-│   │   │   ├── BaseModal.tsx # Modal infrastructure
-│   │   │   ├── LoadingState.tsx  # Loading states
-│   │   │   ├── EmptyState.tsx    # Empty states
-│   │   │   └── FormField.tsx     # Form fields
+│   │   │   ├── Card/BaseCard.tsx         # Standardized card component
+│   │   │   ├── Modal/BaseModal.tsx       # Modal infrastructure
+│   │   │   ├── Loading/LoadingState.tsx  # Loading states
+│   │   │   ├── Empty/EmptyState.tsx      # Empty states
+│   │   │   └── Form/FormField.tsx        # Form fields
 │   │   ├── nft/              # NFT components
 │   │   ├── marketplace/      # Marketplace features
 │   │   ├── layout/           # Layout components
 │   │   ├── ui/               # UI components
 │   │   └── auth/             # Auth components
-│   ├── contexts/              # React contexts
-│   │   ├── NFTContext.tsx    # NFT data management
-│   │   ├── NFTStatsContext.tsx  # Stats & interactions
-│   │   ├── WalletNFTsContext.tsx # Wallet NFTs (DB-first)
-│   │   ├── CollectionsContext.tsx # Collections aggregation
-│   │   ├── MarketplaceCacheContext.tsx # Marketplace cache
+│   ├── contexts/              # React contexts (one folder per domain)
+│   │   ├── nft-stats/        # Stats & interactions
+│   │   ├── wallet-nfts/      # Wallet NFTs (DB-first)
+│   │   ├── collections/      # Collections aggregation
+│   │   ├── marketplace-items/ # Marketplace cache
 │   │   └── CurrencyContext.tsx  # Multi-currency
 │   ├── hooks/                 # Custom React hooks
 │   │   ├── marketplace/      # Marketplace hooks
 │   │   ├── nfts/             # NFT-related hooks
-│   │   └── useForm.ts        # Form validation hook
+│   │   └── ui/useForm.ts     # Form validation hook
 │   ├── lib/                   # Library configurations
 │   │   ├── api/              # API infrastructure
 │   │   │   ├── handler.ts    # apiHandler wrapper
@@ -294,21 +293,17 @@ nextjs-nft-marketplace-w3i-2.0/
 │   │   ├── mongodb.ts        # Database connection
 │   │   └── utils.ts          # Utilities
 │   ├── services/              # Business logic services
-│   │   ├── blockchain/       # Blockchain services
-│   │   │   └── TransactionService.ts  # Contract interactions
-│   │   └── nft/              # NFT services
+│   │   └── blockchain/       # Blockchain services
+│   │       └── transaction-service.ts  # Contract interactions
 │   ├── types/                 # TypeScript types
-│   │   ├── nft.ts            # NFT types
-│   │   ├── api.ts            # API types
-│   │   ├── events.ts         # Custom events
+│   │   ├── core/             # NFT types, custom events
+│   │   ├── api/              # API types
 │   │   └── index.ts          # Type exports
 │   ├── utils/                 # Utility functions
-│   │   ├── nft-helpers.ts    # NFT utilities
-│   │   ├── formatters.ts     # Data formatting
-│   │   └── validation.ts     # Validation helpers
-│   ├── config/                # App configuration
-│   ├── constants/             # Constants
-│   └── schemas/               # Data schemas
+│   │   ├── nft/              # NFT utilities
+│   │   ├── formatters/       # Data formatting
+│   │   └── validation/       # Validation helpers
+│   └── config/                # App configuration
 ├── scripts/                   # Utility scripts
 │   ├── production/           # Production scripts
 │   │   ├── sync-marketplace-data.js  # Main sync service

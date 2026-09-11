@@ -18,7 +18,7 @@ diese Entscheidung: `state/gates.md`, Kalibrierungs-Log.
 Ein Eintrag ist eine Zeile, kein Aufsatz.
 -->
 
-# Reibungs-Log — nextjs-nft-marketplace-w3i-2.0-harness
+# Reibungs-Log — nextjs-nft-marketplace-w3i-2.0
 
 | Datum | Was hat aufgehalten | Wo (Datei/Schritt) | Kosten (grob) | Erledigt? |
 |---|---|---|---|---|

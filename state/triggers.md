@@ -1,5 +1,5 @@
 <!-- Ziel-Pfad im Repo: state/triggers.md -->
-# Trigger-Inventar — nextjs-nft-marketplace-w3i-2.0-harness
+# Trigger-Inventar — nextjs-nft-marketplace-w3i-2.0
 
 ## Abgrenzung zu state/gates.md
 

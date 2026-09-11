@@ -58,7 +58,7 @@ getrennt laufen lassen, falls das Projekt Harness-Selbstprüfung und
 Projekt-Prüfkette getrennt beobachten will). Danach bei Bedarf einen
 PostToolUse-Lint-Hook manuell in `.claude/settings.json` ergänzen — der
 wurde entfernt, weil er ohne echten Linter nach jeder Dateiänderung
-scheitert (siehe `state/tasks/harness-fix-4-pruefkette-und-vertragspruefung.md`).
+scheitert (Herkunft: Template-Auftrag „harness-fix-4“, in dieses Repo nicht übernommen).
 
 ## 4. `check-rules.mjs` befüllen
 

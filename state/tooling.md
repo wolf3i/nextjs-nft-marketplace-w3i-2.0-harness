@@ -1,5 +1,5 @@
 <!-- Ziel-Pfad im Repo: state/tooling.md -->
-# Tooling-Bestand — nextjs-nft-marketplace-w3i-2.0-harness
+# Tooling-Bestand — nextjs-nft-marketplace-w3i-2.0
 
 ## Im Einsatz
 
