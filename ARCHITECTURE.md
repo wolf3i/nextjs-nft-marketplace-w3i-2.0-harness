@@ -24,14 +24,31 @@ nicht geprüft, deshalb hier nicht behauptet.
 
 ## 2. Datenzugriff
 
-Jede Mutation, die `nft_metadata`, `marketplace_items` oder `nft_stats`
-betrifft, muss durch die bestehenden Invalidierungs-Helfer in
-`src/services/validation/data-invalidation.ts` laufen (`invalidateAfterListing`,
-`invalidateAfterPurchase`, `invalidateAllCachesForNFT` u. a.) — direktes
-Schreiben von Context-State ohne diese Helfer ist die häufigste Ursache für
-veraltete UI-Anzeigen in diesem Projekt.
-Belegt durch: `src/services/validation/data-invalidation.ts`, beschrieben in
-`CLAUDE.md`.
+Invalidierung läuft in zwei Schichten, jede mit eigenen Helfern:
+
+- **Client:** Nach einer Marktplatz-Aktion (Listing, Kauf, Stornierung) wird
+  Context-State nicht direkt geschrieben, sondern über die Event-Helfer in
+  `src/services/validation/data-invalidation.ts` aktualisiert
+  (`invalidateAfterListing`, `invalidateAfterPurchase`,
+  `invalidateAfterCancelListing`); die Contexts hören über
+  `onDataInvalidation` darauf. Direktes Schreiben von Context-State ohne diese
+  Helfer ist die häufigste Ursache für veraltete UI-Anzeigen in diesem Projekt.
+  Belegt durch: Exporte von `src/services/validation/data-invalidation.ts`;
+  Aufrufer `src/services/blockchain/transaction-service.ts` und
+  `src/services/marketplace/event-invalidation-bridge.ts`; Empfänger u. a.
+  `src/contexts/marketplace-items/MarketplaceItemsContext.tsx`.
+- **Server:** Eine API-Route, die in `nft_stats` schreibt, leert danach den
+  In-Memory-Cache über `src/lib/cache.ts` (`invalidateAllCachesForNFT` für
+  Stats und Interaktionen, `invalidateStatsCache` nur für Stats).
+  Belegt durch: Exporte von `src/lib/cache.ts`; Aufrufer
+  `src/app/api/user/interactions/route.ts` und `src/app/api/nft/stats/route.ts`.
+  Bekannte Ausnahme: `src/app/api/nft/stats/update/route.ts` (Befund in
+  `state/repo-audit-befunde.md`).
+
+Nicht belegt und deshalb hier nicht behauptet: dass **jede** Mutation an
+`nft_metadata`, `marketplace_items` oder `nft_stats` über diese Helfer läuft —
+die Sync-Services im Worker schreiben direkt. Offene Annahme in
+`state/assumption-ledger.md`.
 
 ## 3. Auth
 

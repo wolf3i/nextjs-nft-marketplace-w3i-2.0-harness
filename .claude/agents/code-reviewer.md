@@ -16,7 +16,7 @@ nicht vor dem Bauen (dafuer architecture-advisor).
 ### Code-Qualitaet
 - [ ] Einheiten (Funktionen/Komponenten/Module) sind klein und haben eine
       klare Aufgabe
-- [ ] Typisiert, kein Escape-Hatch (kein `any` o.ae.)
+- [ ] Typisiert, kein neuer Escape-Hatch (kein neues `any` o.ae.) in geändertem Code — Altbestand ausgenommen, Geltungsgrenze laut Definition of Done in `CLAUDE.md`
 - [ ] Businesslogik ist von Darstellung/IO getrennt
 - [ ] Kein unnoetig duplizierter Code
 - [ ] Vorhandene Helper genutzt statt neu geschrieben (CLAUDE.md-Regel)

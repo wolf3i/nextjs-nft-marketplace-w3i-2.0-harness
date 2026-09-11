@@ -37,7 +37,7 @@ geprüft. `docs/` hat 70 Markdown-Dateien (nicht 59 wie im Auftrag, Stand
 | Klasse | Befunde | davon Einzelverweise |
 |---|---|---|
 | A | 6 | 35 geänderte Stellen (21 Baum-Einträge, 10 Überschriften, 2 Verweise, 1 Regelzeile, 1 Löschung) |
-| B | 44 | 19 Einzelbefunde + 25 Altdokumente mit zusammen 106 toten Verweisen, dazu ein Code-Hinweis |
+| B | 42 | 17 Einzelbefunde + 25 Altdokumente mit zusammen 106 toten Verweisen, dazu ein Code-Hinweis (Stand nach Phase 3c: 3 behoben, 1 neu — siehe Nachtrag) |
 | C | 12 | Trefferzahl je Zeile in der Tabelle |
 
 ## Klasse A — behoben
@@ -58,11 +58,9 @@ geprüft. `docs/` hat 70 Markdown-Dateien (nicht 59 wie im Auftrag, Stand
 | Fundort | Behauptung | Ist-Stand | Kategorie | Alter |
 |---|---|---|---|---|
 | `CLAUDE.md:132` (bis 10.09.2026) | „davon 24 in den Dateien, die die aktuelle Migration umbaut" | **Entfernt, weil nicht reproduzierbar**: Die Dateiliste der Migration ist nirgends festgehalten, und keine Zählung über die vier Routen aus `specs/marktplatz-fertigstellung.md` ergibt 24 (18, 18, 36 oder 41, je nach Muster). Die Zahl 206 steht weiter in `specs/marktplatz-fertigstellung.md:155` und `:176` | unbelegt | 08.09.2026 |
-| `CLAUDE.md:69`, `ARCHITECTURE.md:30` | `invalidateAllCachesForNFT` liegt in `src/services/validation/data-invalidation.ts` | liegt in `src/lib/cache.ts:112`; `data-invalidation.ts` exportiert es nicht | veraltet | 08.09.2026 |
-| `CLAUDE.md:18` | „Quality gates (run all three … CI runs the same)": lint, typecheck, test:coverage | Gate laut DoD ist `npm run check` (sieben Stufen); CI fährt `check`, `test:coverage`, Audit, Build | veraltet | 08.09.2026 |
 | `CLAUDE.md:82` | Web-Prozess startet mit `npm start` | `Dockerfile:36` startet `npm run start:web`; nur `nixpacks.toml:11` nutzt `npm start` | veraltet | 08.09.2026 |
+| `src/app/api/nft/stats/update/route.ts:41` | — (Code, nicht Doku; gefunden in Phase 3c) | schreibt in `nft_stats`, leert aber den Server-Cache aus `src/lib/cache.ts` nicht — anders als `src/app/api/nft/stats/route.ts` und `src/app/api/user/interactions/route.ts`. Möglicherweise veraltete Stats bis zum TTL von 5 s; Auswirkung nicht geprüft | Code-Befund | — |
 | `Dockerfile:1` ↔ `.nvmrc` | — | Produktionsimage `node:22`, Entwicklungsstand `.nvmrc` 20.19.0; nirgends dokumentiert, ob Absicht | undokumentiert | 18.03.2026 |
-| `.claude/agents/code-reviewer.md:19` | „kein Escape-Hatch (kein `any` o.ae.)" | widerspricht der Geltungsgrenze der DoD („kein **neues** `any` in geändertem Code") — der Reviewer mahnt Altbestand an | veraltet | 08.09.2026 |
 | `README.md:148` | Node.js 18.17 or later | `package.json` engines `>=20.19.0`; zudem Versionsangabe außerhalb der Paketdatei | veraltet | 08.09.2026 |
 | `README.md:157`, `:466` | Klon-/Deploy-URL `github.com/yourusername/…` | Platzhalter; welches Repo gemeint ist (dieses, `NiklasHoffmann/…` aus `docs/development/setup.md:18`, `web3ideation/…` aus `MigrationBanner.tsx:74`), entscheidet der Mensch | veraltet | 08.09.2026 |
 | `README.md:179–198` | Env-Block: `NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID`, `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_INFURA_PROJECT_ID`, `COINGECKO_API_KEY` | Code liest `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` (`src/config/wagmi.ts:28`); die übrigen drei liest kein Code. Kein Code-Fehler: beide Templates führen beide Schreibweisen, `env:check` prüft die richtige | veraltet | 08.09.2026 |
@@ -92,7 +90,7 @@ Markdown-Links (`../docs/…` aus `src/services/` zeigt auf `src/docs/…`).
 | `docs/architecture/events.md` | 51 (Link) | 1 | 10.02.2026 |
 | `docs/architecture/features.md` | 10, 31, 67, 79, 300, 310, 363, 389, 400, 600, 641, 642 | 12 | 22.01.2026 |
 | `docs/architecture/fees.md` | 9, 69, 74, 79, 84 | 5 | 22.01.2026 |
-| `docs/architecture/overview.md` | 36, 56, 122, 219, 232 — dazu `invalidateAllCachesForNFT` wie oben | 5 | 22.01.2026 |
+| `docs/architecture/overview.md` | 36, 56, 122, 219, 232 | 5 | 22.01.2026 |
 | `docs/architecture/route-components-analysis.md` | 40 | 1 | 23.01.2026 |
 | `docs/architecture/utilities.md` | 88, 122 (2×) | 3 | 10.02.2026 |
 | `docs/database/quick-fix.md` | 39 (Link) | 1 | 22.01.2026 |
@@ -130,3 +128,14 @@ verlinkt `docs/admin/MULTISIG_MIGRATION_PLAN.md` im Repo `web3ideation/…` — 
 | `docs/api/nft-data-platform-marketplace-migration.md` (24 Treffer) | `src/lib/nft-data-platform/*`, `tests/**` | „Suggested file" / „Test file suggestion" — Plan; `nft-api.md`, `wallet-api.md` liegen im Plattform-Repo |
 | `specs/marktplatz-fertigstellung.md:80`, `docs/integrations/thegraph-setup.md:13`, `scripts/README.md:171`, `src/app/README.md:312–322`, `:479` | diverse | Datei im Plattform-Repo · Anlege-Anweisung · Namensbeispiel · Platzhalter-Vorlage · bewusst gelöschte Datei |
 | `src/components/{core,nft}/README.md`, `src/types/README.md:430`, `src/utils/README.md:453`, `docs/architecture/{components-placement-decision.md:11–12,utilities.md:105–107}` (18 Treffer) | Backtick-Pfade | relativ zu `src/` bzw. zum eigenen Ordner geschrieben, Datei existiert |
+
+## Nachtrag 10.09.2026 — in Phase 3c behoben
+
+Auftrag: `state/tasks/harness-phase3c-anweisungsdokumente.md`. Die drei Zeilen
+sind oben aus Klasse B entfernt.
+
+| Bisheriger Befund | Was geändert wurde |
+|---|---|
+| `CLAUDE.md:69`, `ARCHITECTURE.md:30` — `invalidateAllCachesForNFT` falsch in `data-invalidation.ts` verortet | Beim Nachmessen stellte sich heraus, dass nicht nur die Zuordnung falsch war, sondern auch die Regel „jede Mutation läuft über die Helfer" keine Deckung hat (11 von 13 schreibenden Dateien unter `src/` rufen keinen Helfer). Nach Entscheidung des Menschen aufgeteilt: `ARCHITECTURE.md` Abschnitt 2 nennt jetzt zwei gedeckte Regeln mit echten Belegstellen — Client-Events über `src/services/validation/data-invalidation.ts` (`invalidateAfterListing`, `invalidateAfterPurchase`, `invalidateAfterCancelListing`) und Server-Cache über `src/lib/cache.ts` (`invalidateAllCachesForNFT`, `invalidateStatsCache`); der ungedeckte Teil steht als offene Annahme in `state/assumption-ledger.md`. `CLAUDE.md` sagt dasselbe; der Hinweis auf ein `nft-stats-updated`-Eventsystem ist dort entfallen, weil `createNFTStatsUpdateEvent` in `src/types/core/events.ts` keinen Aufrufer hat |
+| `CLAUDE.md:18` — „run all three … CI runs the same" | Prüfkette ist jetzt `npm run check`; ein Satz nennt, was die CI zusätzlich fährt (gitleaks, `test:coverage`, Dependency-Audit, Build). Die Einzelbefehle stehen weiter als Einzelschritte da |
+| `.claude/agents/code-reviewer.md:19` — `any` pauschal verboten | Prüfzeile auf die Geltungsgrenze der Definition of Done umgestellt, mit Verweis auf `CLAUDE.md`. `qa.md` und `architecture-advisor.md` trugen den Widerspruch nicht |
